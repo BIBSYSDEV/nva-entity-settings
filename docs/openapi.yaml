@@ -1,0 +1,12 @@
+openapi: 3.0.3
+info:
+  title: NVA NVI API
+  version: 0.0.1
+
+paths:
+  /:
+    get:
+      summary: Get all nvi candidates for an affiliation
+      responses:
+        '200':
+          description: All the candidates

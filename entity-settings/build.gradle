@@ -4,4 +4,20 @@ plugins {
 }
 dependencies {
 
+    implementation libs.aws.java.sdk.core
+    implementation libs.aws.sdk2.dynamodb
+    implementation libs.aws.sdk2.secrets
+    implementation libs.nva.commons.core
+    implementation libs.nva.commons.apigateway
+    implementation libs.nva.json
+    implementation libs.jackson.core
+    implementation libs.jackson.annotations
+    implementation libs.jackson.databind
+
+//    runtimeOnly libs.jackson.core
+
+    testImplementation libs.jackson.core
+    testImplementation libs.jackson.databind
+    testImplementation libs.zalando
+    testImplementation libs.nva.testutils
 }

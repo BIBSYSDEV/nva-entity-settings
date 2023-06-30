@@ -6,7 +6,5 @@
  * Detailed information about configuring a multi-project build in Gradle can be found
  * in the user manual at https://docs.gradle.org/8.0/userguide/multi_project_builds.html
  */
-rootProject.name = 'nva-entity-settings'
-include 'nvi-rest'
-include 'nvi-commons'
-include 'nvi-evaluator'
+rootProject.name = 'nva.entity-settings.rootplugin'
+include 'entity-settings'

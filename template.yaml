@@ -93,7 +93,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: nvi-evaluator
-      Handler: no.sikt.nva.nvi.evaluator.EvaluateNviCandidateHandler::handleRequest
+      Handler: no.sikt.nva.entity-settingsevaluator.EvaluateNviCandidateHandler::handleRequest
       Runtime: java17
       Role: !GetAtt NvaNviRole.Arn
       Timeout: 3

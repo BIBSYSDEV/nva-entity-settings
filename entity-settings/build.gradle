@@ -1,6 +1,6 @@
 plugins {
-    id 'nva.nvi.java-conventions'
-    id 'nva.nvi.dynamo-db'
+    id 'nva.entity-settings.java-conventions'
+    id 'nva.entity-settings.dynamo-db'
 }
 dependencies {
 

@@ -6,7 +6,7 @@ info:
 paths:
   /:
     get:
-      summary: Get all nvi candidates for an affiliation
+      summary: Get settings for specified entity
       responses:
         '200':
           description: All the candidates

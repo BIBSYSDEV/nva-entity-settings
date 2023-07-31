@@ -39,14 +39,13 @@ public record SettingsDto(URI settingsId, @JsonProperty("@context") JsonNode con
 
     public SettingsDao toSettingDao() {
         return SettingsDao.Builder.builder()
-            .withSettingsId(settingsId())
+            .withSettingsId(settingsId().toString())
             .withPayload(payload())
             .build();
     }
 
-
     public static final class Builder {
-        private URI settingsId;
+        private String settingsId;
         private String payload;
         private String context;
 
@@ -56,7 +55,7 @@ public record SettingsDto(URI settingsId, @JsonProperty("@context") JsonNode con
             return new Builder();
         }
 
-        public Builder withSettingsId(URI settingsId) {
+        public Builder withSettingsId(String settingsId) {
             this.settingsId = settingsId;
             return this;
         }
@@ -77,8 +76,9 @@ public record SettingsDto(URI settingsId, @JsonProperty("@context") JsonNode con
 
         public SettingsDto build() throws JsonProcessingException {
             var contextNode =JsonUtils.dtoObjectMapper.readTree(context);
-            var payloadNode = JsonUtils.dtoObjectMapper.readTree(context);
-            return new SettingsDto(settingsId, contextNode, payloadNode);
+            var payloadNode = JsonUtils.dtoObjectMapper.readTree(payload);
+            var uri = URI.create(settingsId);
+            return new SettingsDto(uri, contextNode, payloadNode);
         }
 
     }

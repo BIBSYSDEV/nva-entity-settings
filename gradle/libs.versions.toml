@@ -14,7 +14,7 @@ awslog4j2 = { strictly = '1.5.1' }
 wiremock = { strictly = '2.33.2' }
 commons-validator-version = { strictly = '1.7'}
 awsSdk = { strictly = '1.12.462' }
-awsSdk2 = { strictly = '2.20.60' }
+awsSdk2 = { strictly = '2.20.80' }
 jena = { strictly = '4.7.0'}
 
 [libraries]
@@ -50,6 +50,7 @@ aws-sdk2-auth = { group = 'software.amazon.awssdk', name = 'auth', version.ref =
 aws-sdk2-secrets = { group = 'software.amazon.awssdk', name = 'secretsmanager', version.ref = 'awsSdk2' }
 aws-sdk2-regions = { group = 'software.amazon.awssdk', name = 'regions', version.ref = 'awsSdk2' }
 aws-sdk2-dynamodb = { group = 'software.amazon.awssdk', name = 'dynamodb', version.ref = 'awsSdk2'}
+aws-sdk2-dynamodbenhanced = { group = 'software.amazon.awssdk', name = 'dynamodb-enhanced', version.ref = 'awsSdk2'}
 
 jackson-core = { group = 'com.fasterxml.jackson.core', name = 'jackson-core', version.ref = 'jackson' }
 jackson-databind = { group = 'com.fasterxml.jackson.core', name = 'jackson-databind', version.ref = 'jackson' }

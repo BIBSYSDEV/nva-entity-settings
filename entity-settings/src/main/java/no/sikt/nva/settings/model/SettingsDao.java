@@ -7,28 +7,34 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import no.unit.nva.commons.json.JsonUtils;
 import nva.commons.core.JacocoGenerated;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
 
-import java.net.URI;
+import java.time.Instant;
 import java.util.Objects;
 
 import static nva.commons.core.attempt.Try.attempt;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonDeserialize(builder = SettingsDao.Builder.class)
+@DynamoDbBean
 public class SettingsDao {
-    private URI settingsId;
+    private String settingsId;
+    private Instant updated;
     private String payload;
 
     private SettingsDao(Builder builder) {
         setSettingsId(builder.settingsId);
+        setUpdated(builder.updated);
         setPayload(builder.payload);
     }
 
-    public URI getSettingsId() {
+    @DynamoDbPartitionKey
+    public String getSettingsId() {
         return settingsId;
     }
 
-    public void setSettingsId(URI settingsId) {
+    public void setSettingsId(String settingsId) {
         this.settingsId = settingsId;
     }
 
@@ -38,6 +44,14 @@ public class SettingsDao {
 
     public void setPayload(String payload) {
         this.payload = payload;
+    }
+
+    public Instant getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(Instant updated) {
+        this.updated = updated;
     }
 
     @Override
@@ -50,13 +64,14 @@ public class SettingsDao {
             return false;
         }
         return Objects.equals(getSettingsId(), that.getSettingsId())
+            && Objects.equals(getUpdated(), that.getUpdated())
             && Objects.equals(getPayload(), that.getPayload());
     }
 
     @Override
     @JacocoGenerated
     public int hashCode() {
-        return Objects.hash(getSettingsId(), getPayload());
+        return Objects.hash(getSettingsId(), getUpdated(), getPayload());
     }
 
     @Override
@@ -72,20 +87,33 @@ public class SettingsDao {
             .build();
     }
 
+    public SettingsDao merge(SettingsDto setting) {
+        setPayload(setting.payload().asText());
+        setUpdated(Instant.now());
+        return this;
+    }
+
     @JsonPOJOBuilder
     public static final class Builder {
-        private URI settingsId;
+        private String settingsId;
+        public Instant updated;
         private String payload;
 
         private Builder() {
+            this.updated = Instant.now();
         }
 
         public static Builder builder() {
             return new Builder();
         }
 
-        public Builder withSettingsId(URI settingsId) {
+        public Builder withSettingsId(String settingsId) {
             this.settingsId = settingsId;
+            return this;
+        }
+
+        public Builder withUpdated(Instant updated) {
+            this.updated = updated;
             return this;
         }
 

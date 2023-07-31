@@ -6,6 +6,7 @@ dependencies {
 
     implementation libs.aws.java.sdk.core
     implementation libs.aws.sdk2.dynamodb
+    implementation libs.aws.sdk2.dynamodbenhanced
     implementation libs.aws.sdk2.secrets
     implementation libs.nva.commons.core
     implementation libs.nva.commons.apigateway

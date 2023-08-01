@@ -36,13 +36,11 @@ public class GetSettingsHandler  extends ApiGatewayHandler<Void, SettingsDto> {
     @Override
     protected SettingsDto processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
-
-        AccessControl.validate(requestInfo, AccessRight.USER);
-        var settingId = UUID.fromString(
-            UriWrapper.fromUri(
-                requestInfo.getRequestUri()).getLastPathElement()
-        );
-        return settingsService.getSetting(settingId);
+        AccessControl
+            .validate(requestInfo, AccessRight.USER);
+        return
+            settingsService
+                .getSetting(requestInfo.getRequestUri());
     }
 
     @Override

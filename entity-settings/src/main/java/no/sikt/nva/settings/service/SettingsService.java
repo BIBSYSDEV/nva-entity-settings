@@ -25,33 +25,44 @@ import java.util.UUID;
 
 public class  SettingsService {
 
-    public static final String SETTING_NOT_FOUND_CLIENT_MESSAGE = "Setting not found: ";
-    private final DynamoDbClient dynamoDbClient;
+    private static final String SETTING_NOT_FOUND_CLIENT_MESSAGE = "Settings not found: ";
+    private static final String ENVIRONMENT_TABLE_NAME = "TABLE_NAME";
+    private static final String ENVIRONMENT_AWS_REGION = "AWS_REGION";
+    private static final String DEFAULT_TABLE_NAME = "Settings";
+    private static final String EU_VEST_1 = "eu-vest-1";
     private final DynamoDbEnhancedClient enhancedClient;
-    private final String tableName;
     private final DynamoDbTable<SettingsDao> settingsTable;
+
+    private static DynamoDbClient dbClientFromEnvironment(Environment environment) {
+        var regionName =
+            environment
+                .readEnvOpt(ENVIRONMENT_AWS_REGION)
+                .orElse(EU_VEST_1);
+        return
+            DynamoDbClient.builder()
+                .region(Region.of(regionName))
+                .build();
+    }
+
+    private static String tableNameFromEnvironment(Environment environment) {
+        return
+            environment
+                .readEnvOpt(ENVIRONMENT_TABLE_NAME)
+                .orElse(DEFAULT_TABLE_NAME);
+    }
 
     @JacocoGenerated
     public SettingsService(Environment environment) {
-        tableName = environment.readEnvOpt("TABLE_NAME")
-            .orElse("Settings");
-        var region = Region.of(environment.readEnvOpt("AWS_REGION")
-            .orElse("eu-vest-1"));
-        dynamoDbClient = DynamoDbClient.builder()
-            .region(region)
-            .build();
-        enhancedClient = DynamoDbEnhancedClient.builder()
-            .dynamoDbClient(dynamoDbClient)
-            .build();
-        settingsTable = enhancedClient.table(tableName, TableSchema.fromBean(SettingsDao.class));
+        this(
+            dbClientFromEnvironment(environment),
+            tableNameFromEnvironment(environment)
+        );
     }
 
     /**
      * Creates a new DynamoDBClient.
      */
-    public SettingsService(DynamoDbClient dbClient,String tableName) {
-        this.tableName = tableName;
-        this.dynamoDbClient = dbClient;
+    public SettingsService(DynamoDbClient dynamoDbClient,String tableName) {
         this.enhancedClient = DynamoDbEnhancedClient.builder()
             .dynamoDbClient(dynamoDbClient)
             .build();
@@ -70,11 +81,12 @@ public class  SettingsService {
             var key = Key.builder()
                 .partitionValue(extractUuidFromUri(id).toString())
                 .build();
-
             var settingDao = settingsTable
                 .getItem(requestBuilder -> requestBuilder.key(key));
+
             return Objects.requireNonNullElseGet(settingDao, () -> createEmptySetting(id))
                 .toSettingDto();
+
         } catch (DynamoDbException e) {
             throw new NotFoundException(SETTING_NOT_FOUND_CLIENT_MESSAGE);
         } catch (JsonProcessingException e) {

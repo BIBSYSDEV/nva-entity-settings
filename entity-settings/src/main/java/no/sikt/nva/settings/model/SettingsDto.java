@@ -1,36 +1,15 @@
 package no.sikt.nva.settings.model;
 
+import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import no.unit.nva.commons.json.JsonUtils;
-
 import java.net.URI;
-import java.util.Objects;
-
-import static nva.commons.core.attempt.Try.attempt;
+import no.unit.nva.commons.json.JsonUtils;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public record SettingsDto(URI id, @JsonProperty("@context") JsonNode context, JsonNode payload)  {
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof SettingsDto that)) {
-            return false;
-        }
-        return Objects.equals(id(), that.id())
-            && Objects.equals(context(), that.context())
-            && Objects.equals(payload(), that.payload());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id(), payload(), context());
-    }
 
     @Override
     public String toString() {

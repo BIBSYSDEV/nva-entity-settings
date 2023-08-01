@@ -88,7 +88,7 @@ public class SettingsDao {
     }
 
     public SettingsDao merge(SettingsDto setting) {
-        setPayload(setting.payload().asText());
+        setPayload(setting.payload().toString());
         setUpdated(Instant.now());
         return this;
     }

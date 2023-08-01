@@ -30,42 +30,21 @@ public class  SettingsService {
     private static final String ENVIRONMENT_AWS_REGION = "AWS_REGION";
     private static final String DEFAULT_TABLE_NAME = "Settings";
     private static final String EU_VEST_1 = "eu-vest-1";
-    private final DynamoDbEnhancedClient enhancedClient;
     private final DynamoDbTable<SettingsDao> settingsTable;
-
-    private static DynamoDbClient dbClientFromEnvironment(Environment environment) {
-        var regionName =
-            environment
-                .readEnvOpt(ENVIRONMENT_AWS_REGION)
-                .orElse(EU_VEST_1);
-        return
-            DynamoDbClient.builder()
-                .region(Region.of(regionName))
-                .build();
-    }
-
-    private static String tableNameFromEnvironment(Environment environment) {
-        return
-            environment
-                .readEnvOpt(ENVIRONMENT_TABLE_NAME)
-                .orElse(DEFAULT_TABLE_NAME);
-    }
 
     @JacocoGenerated
     public SettingsService(Environment environment) {
-        this(
-            dbClientFromEnvironment(environment),
-            tableNameFromEnvironment(environment)
-        );
+        this(dbClientFrom(environment),tableNameFrom(environment));
     }
 
     /**
      * Creates a new DynamoDBClient.
      */
     public SettingsService(DynamoDbClient dynamoDbClient,String tableName) {
-        this.enhancedClient = DynamoDbEnhancedClient.builder()
-            .dynamoDbClient(dynamoDbClient)
-            .build();
+        var enhancedClient =
+            DynamoDbEnhancedClient.builder()
+                .dynamoDbClient(dynamoDbClient)
+                .build();
         settingsTable = enhancedClient.table(tableName, TableSchema.fromBean(SettingsDao.class));
     }
 
@@ -76,19 +55,11 @@ public class  SettingsService {
      * @return contentsDocument as json string
      * @throws NotFoundException contentsDocument not found
      */
-    public SettingsDto getSetting(URI id) throws ApiGatewayException {
+    public SettingsDto fetch(URI id) throws ApiGatewayException {
         try {
-            var key = Key.builder()
-                .partitionValue(extractUuidFromUri(id).toString())
-                .build();
-            var settingDao = settingsTable
-                .getItem(requestBuilder -> requestBuilder.key(key));
-
-            return Objects.requireNonNullElseGet(settingDao, () -> createEmptySetting(id))
-                .toSettingDto();
-
-        } catch (DynamoDbException e) {
-            throw new NotFoundException(SETTING_NOT_FOUND_CLIENT_MESSAGE);
+            return
+                fetchOrDefaultSettings(id)
+                    .toSettingDto();
         } catch (JsonProcessingException e) {
             throw new GatewayResponseSerializingException(e);
         }
@@ -97,18 +68,35 @@ public class  SettingsService {
     /**
      * Updates the contentsDocument identified by its isbn.
      *
-     * @param setting to be updated
-     * @return
+     * @param settingsDto to be updated
+     * @return persisted SettingsDto
      * @throws ApiGatewayException exception while connecting to database
      */
-    public SettingsDto update(SettingsDto setting) throws ApiGatewayException {
+    public SettingsDto update(SettingsDto settingsDto) throws ApiGatewayException {
         try {
-            var oldSetting = getSetting(setting.settingsId())
-                .toSettingDao();
-            return settingsTable.updateItem(oldSetting.merge(setting))
-                .toSettingDto();
+            var oldSettingsDao = fetchOrDefaultSettings(settingsDto.id());
+            return
+                settingsTable
+                    .updateItem(oldSettingsDao.merge(settingsDto))
+                    .toSettingDto();
         } catch (DynamoDbException | JsonProcessingException e) {
             throw new BadGatewayException(e.getMessage());
+        }
+    }
+
+    private SettingsDao fetchOrDefaultSettings(URI id) throws ApiGatewayException {
+        try {
+            var key =
+                Key.builder()
+                    .partitionValue(extractUuidFromUri(id).toString())
+                    .build();
+            var item =
+                settingsTable
+                    .getItem(requestBuilder -> requestBuilder.key(key));
+
+            return Objects.requireNonNullElseGet(item, () -> createEmptySetting(id));
+        } catch (DynamoDbException e) {
+            throw new NotFoundException(SETTING_NOT_FOUND_CLIENT_MESSAGE);
         }
     }
 
@@ -127,6 +115,24 @@ public class  SettingsService {
                 UriWrapper.fromUri(id)
                     .getLastPathElement()
             );
+    }
+
+    private static DynamoDbClient dbClientFrom(Environment environment) {
+        var regionName =
+            environment
+                .readEnvOpt(ENVIRONMENT_AWS_REGION)
+                .orElse(EU_VEST_1);
+        return
+            DynamoDbClient.builder()
+                .region(Region.of(regionName))
+                .build();
+    }
+
+    private static String tableNameFrom(Environment environment) {
+        return
+            environment
+                .readEnvOpt(ENVIRONMENT_TABLE_NAME)
+                .orElse(DEFAULT_TABLE_NAME);
     }
 
 }

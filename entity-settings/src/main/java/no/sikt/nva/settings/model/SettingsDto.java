@@ -12,7 +12,7 @@ import java.util.Objects;
 import static nva.commons.core.attempt.Try.attempt;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
-public record SettingsDto(URI settingsId, @JsonProperty("@context") JsonNode context, JsonNode payload)  {
+public record SettingsDto(URI id, @JsonProperty("@context") JsonNode context, JsonNode payload)  {
 
     @Override
     public boolean equals(Object o) {
@@ -22,14 +22,14 @@ public record SettingsDto(URI settingsId, @JsonProperty("@context") JsonNode con
         if (!(o instanceof SettingsDto that)) {
             return false;
         }
-        return Objects.equals(settingsId(), that.settingsId())
+        return Objects.equals(id(), that.id())
             && Objects.equals(context(), that.context())
             && Objects.equals(payload(), that.payload());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(settingsId(), payload(), context());
+        return Objects.hash(id(), payload(), context());
     }
 
     @Override
@@ -39,7 +39,7 @@ public record SettingsDto(URI settingsId, @JsonProperty("@context") JsonNode con
 
     public SettingsDao toSettingDao() {
         return SettingsDao.Builder.builder()
-            .withSettingsId(settingsId().toString())
+            .withSettingsId(id().toString())
             .withPayload(payload())
             .build();
     }

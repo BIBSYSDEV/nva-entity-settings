@@ -10,26 +10,23 @@ import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
-import nva.commons.core.paths.UriWrapper;
 import org.apache.http.HttpStatus;
 
-import java.util.UUID;
-
-public class GetSettingsHandler  extends ApiGatewayHandler<Void, SettingsDto> {
+public class FetchSettingsHandler extends ApiGatewayHandler<Void, SettingsDto> {
 
     private final SettingsService settingsService;
 
     @JacocoGenerated
-    public GetSettingsHandler() {
+    public FetchSettingsHandler() {
         this(new Environment());
     }
 
     @JacocoGenerated
-    public GetSettingsHandler(Environment environment) {
+    public FetchSettingsHandler(Environment environment) {
         this(environment, new SettingsService(environment));
     }
 
-    public GetSettingsHandler(Environment environment, SettingsService settingsService) {
+    public FetchSettingsHandler(Environment environment, SettingsService settingsService) {
         super(Void.class, environment);
         this.settingsService = settingsService;
     }
@@ -40,7 +37,7 @@ public class GetSettingsHandler  extends ApiGatewayHandler<Void, SettingsDto> {
             .validate(requestInfo, AccessRight.USER);
         return
             settingsService
-                .getSetting(requestInfo.getRequestUri());
+                .fetch(requestInfo.getRequestUri());
     }
 
     @Override

@@ -13,7 +13,6 @@ import nva.commons.core.JacocoGenerated;
 
 public class UpdateSettingsHandler  extends ApiGatewayHandler<SettingsDto, SettingsDto> {
 
-
     private final SettingsService settingsService;
 
     @JacocoGenerated
@@ -31,10 +30,13 @@ public class UpdateSettingsHandler  extends ApiGatewayHandler<SettingsDto, Setti
         this.settingsService = settingsService;
     }
     @Override
-    protected SettingsDto processInput(SettingsDto input, RequestInfo requestInfo, Context context)
+    protected SettingsDto processInput(SettingsDto inputSettings, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
-        AccessControl.validate(requestInfo, AccessRight.USER);
-        return settingsService.update(input);
+        AccessControl
+            .validate(requestInfo, AccessRight.USER);
+        return
+            settingsService
+                .update(inputSettings);
     }
 
     @Override
